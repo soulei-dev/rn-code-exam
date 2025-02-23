@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 import React, { useEffect } from 'react';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from '../constants/colors';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { FONTS } from '@constants/fonts';
@@ -23,15 +23,12 @@ const RootLayout = () => {
   return (
     <Stack
       screenOptions={{
+        headerShown: false,
         contentStyle: {
           backgroundColor: COLORS.background,
         },
       }}
-    >
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="quiz" />
-      <Stack.Screen name="results" />
-    </Stack>
+    />
   );
 };
 

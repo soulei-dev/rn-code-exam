@@ -1,13 +1,16 @@
 import React from 'react';
-import { Text, ScrollView, View, FlatList } from 'react-native';
-import styles from './styles';
+import { Text, ScrollView, View, FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Spacer from '@components/generals/Spacer/Spacer';
-import ScoreDisplay from '@components/generals/ScoreDisplay/ScoreDisplay';
-import ResultCard from '@components/cards/ResultCard/ResultCard';
-import AddButton from '@components/buttons/FloatingAddButton/FloatingAddButton';
+import Spacer from '@components/generals/Spacer';
+import ScoreDisplay from '@components/generals/ScoreDisplay';
+import ResultCard from '@components/cards/ResultCard';
+import AddButton from '@components/buttons/FloatingAddButton';
+import { COLORS } from '@constants/colors';
+import { useRouter } from 'expo-router';
 
 const HomeScreen = () => {
+  const router = useRouter();
+
   const mockScores = [
     { score: 37, label: 'Meilleure score' },
     { score: 28, label: 'Dernier score' },
@@ -58,9 +61,43 @@ const HomeScreen = () => {
           </View>
         </SafeAreaView>
       </ScrollView>
-      <AddButton onPress={() => {}} />
+      <AddButton onPress={() => router.push('/quiz')} />
     </>
   );
 };
 
 export default HomeScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 32,
+    fontFamily: 'BricolageGrotesque-ExtraBold',
+    color: COLORS.primary,
+    paddingHorizontal: 28,
+    lineHeight: 41.6,
+    letterSpacing: 0.32,
+  },
+  content: {
+    paddingHorizontal: 15,
+  },
+  resultsTitle: {
+    fontSize: 12,
+    fontFamily: 'Poppins-Regular',
+    color: COLORS.gray,
+  },
+  scoreContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    height: 121,
+    backgroundColor: '#DEF7F9',
+    borderRadius: 16,
+    alignItems: 'center',
+    paddingHorizontal: 16,
+  },
+  listContentContainer: {
+    paddingBottom: 150,
+  },
+});
