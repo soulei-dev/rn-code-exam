@@ -33,7 +33,6 @@ const quizSlice = createSlice({
         state.selectedAnswers[key] = state.selectedAnswers[key].filter((a) => a.label !== answer.label);
       } else {
         state.selectedAnswers[key].push(answer);
-        console.log("DEBUG selected answers", JSON.stringify(state.selectedAnswers, null, 2));
       }
     },
     nextQuestion(state) {

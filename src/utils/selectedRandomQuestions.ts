@@ -26,7 +26,6 @@ const shuffleArray = <T>(array: T[]): T[] => {
 
 export const selectRandomQuestions = (): Question[] => {
   const flatQuestionsData = questionsData.flatMap(category => category[1].questions);
-  console.log("Check length of flatQuestionsData: ", flatQuestionsData.length)
 
   const categorizedQuestions: Record<string, Question[]> = {};
 
@@ -46,11 +45,9 @@ export const selectRandomQuestions = (): Question[] => {
     const count = Math.min(availableQuestions.length, getRandomInt(min, max));
 
     selectedQuestions.push(...shuffleArray(availableQuestions).slice(0, count));
-    console.log("DEBUG selectedQuestions: ", JSON.stringify(selectedQuestions, null, 2))
   }
 
   if (selectedQuestions.length < MAX_QUESTIONS) {
-    console.log('pas assez - ajouter questions')
     const remaining = Math.min(MAX_QUESTIONS - selectedQuestions.length, flatQuestionsData.length);
     
     selectedQuestions.push(...shuffleArray(flatQuestionsData).slice(0, remaining));

@@ -29,12 +29,6 @@ const HomeScreen = () => {
     { id: '8', date: new Date(2024, 9, 20, 17, 55), score: 30 },
   ];
 
-  useEffect(() => {
-    const randomQuestions = selectRandomQuestions();
-
-    console.log(randomQuestions[0].question);
-  }, []);
-
   return (
     <>
       <ScrollView style={styles.container}>
