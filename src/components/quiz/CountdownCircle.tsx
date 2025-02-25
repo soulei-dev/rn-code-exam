@@ -1,45 +1,56 @@
 import { COLORS } from '@constants/colors';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 
 type CountdownCircleProps = {
   duration: number;
-  onTimeout: () => void;
+  remainingTime: number;
+  onRemainingTime: React.Dispatch<React.SetStateAction<number>>;
 };
 
-const CountdownCircle = ({ duration, onTimeout }: CountdownCircleProps) => {
+const CountdownCircle = ({
+  duration,
+  remainingTime,
+  onRemainingTime,
+}: CountdownCircleProps) => {
   const radius = 18;
   const strokeWidth = 5;
   const circumference = 2 * Math.PI * radius;
 
-  const [remainingTime, setRemainingTime] = useState(duration);
   const [progress, setProgress] = useState(1);
+  const animationFrameRef = useRef<number | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number | null>(null);
 
   useEffect(() => {
-    let startTime: number | null = null;
+    onRemainingTime(duration);
+    setProgress(1);
+    startTimeRef.current = Date.now();
 
-    const animate = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const elapsedTime = (timestamp - startTime) / 1000;
+    const animate = () => {
+      const elapsedTime =
+        (Date.now() - (startTimeRef.current as number)) / 1000;
       const newProgress = Math.max(1 - elapsedTime / duration, 0);
-
       setProgress(newProgress);
-      setRemainingTime(Math.ceil(duration - elapsedTime));
 
       if (newProgress > 0) {
-        requestAnimationFrame(animate);
-      } else {
-        onTimeout();
+        animationFrameRef.current = requestAnimationFrame(animate);
       }
     };
 
-    requestAnimationFrame(animate);
+    intervalRef.current = setInterval(() => {
+      onRemainingTime((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
+    animationFrameRef.current = requestAnimationFrame(animate);
 
     return () => {
-      startTime = null;
+      if (animationFrameRef.current)
+        cancelAnimationFrame(animationFrameRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [duration, onTimeout]);
+  }, [duration]);
 
   return (
     <View style={styles.container}>

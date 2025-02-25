@@ -1,8 +1,8 @@
 import CountdownCircle from '@components/quiz/CountdownCircle';
 import Spacer from '@components/generals/Spacer';
 import { COLORS } from '@constants/colors';
-import { MAX_QUESTIONS } from '@constants/quizConstants';
-import React from 'react';
+import { MAX_QUESTIONS, TIMER_DURATION } from '@constants/quizConstants';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AnswerOptions from '@components/quiz/AnswerOptions';
@@ -20,9 +20,15 @@ const QuizScreen = () => {
     (state: RootState) => state.quiz,
   );
 
+  const [remainingTime, setRemainingTime] = useState<number>(TIMER_DURATION);
+
   const question = questions[currentQuestionIndex];
 
   const hasQuestionParts = question.questionPart1 && question.questionPart2;
+
+  const resetTimer = () => {
+    setRemainingTime(TIMER_DURATION);
+  };
 
   const handleSelectedAnswer = (
     answer: Answer,
@@ -52,7 +58,14 @@ const QuizScreen = () => {
     }
 
     dispatch(nextQuestion());
+    resetTimer();
   };
+
+  useEffect(() => {
+    if (remainingTime === 0) {
+      handleValidateQuestion();
+    }
+  }, [remainingTime]);
 
   return (
     <>
@@ -67,8 +80,10 @@ const QuizScreen = () => {
               currentQuestionIndex + 1
             }/${MAX_QUESTIONS}`}</Text>
             <CountdownCircle
-              duration={20}
-              onTimeout={() => dispatch(nextQuestion())}
+              key={currentQuestionIndex}
+              duration={TIMER_DURATION}
+              remainingTime={remainingTime}
+              onRemainingTime={setRemainingTime}
             />
           </View>
           <Spacer size={49} />
