@@ -2,121 +2,98 @@ import CountdownCircle from '@components/quiz/CountdownCircle';
 import Spacer from '@components/generals/Spacer';
 import { COLORS } from '@constants/colors';
 import { MAX_QUESTIONS } from '@constants/quizConstants';
-import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AnswerOptions from '@components/quiz/AnswerOptions';
 import CustomButton from '@components/buttons/CustomButton';
-import { useRouter } from 'expo-router';
-
-const mockQuestion = {
-  id: '1',
-  question: 'Dans un bouchon',
-  questionPart1: 'Je peux lire un texto rapidement :',
-  questionPart2: 'Si je suis arrêté au feu rouge ?',
-  answers: [
-    { label: 'Oui' },
-    { correct: true, label: 'Non' },
-    { label: 'Oui' },
-    { correct: true, label: 'Non' },
-  ],
-};
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@store/store';
+import { selectAnswer, nextQuestion } from '@store/quizSlice';
+import { Answer } from '@models/question';
 
 const QuizScreen = () => {
-  const [selectedAnswersSingle, setSelectedAnswersSingle] = useState<string[]>(
-    [],
-  );
-  const [selectedAnswersPart1, setSelectedAnswersPart1] = useState<string[]>(
-    [],
-  );
-  const [selectedAnswersPart2, setSelectedAnswersPart2] = useState<string[]>(
-    [],
+  const dispatch = useDispatch();
+  const { questions, currentQuestionIndex, selectedAnswers } = useSelector(
+    (state: RootState) => state.quiz,
   );
 
-  const hasQuestionParts =
-    mockQuestion.questionPart1 && mockQuestion.questionPart2;
+  const question = questions[currentQuestionIndex];
 
-  const answersPart1 = hasQuestionParts
-    ? mockQuestion.answers.slice(0, mockQuestion.answers.length / 2)
-    : [];
-  const answersPart2 = hasQuestionParts
-    ? mockQuestion.answers.slice(mockQuestion.answers.length / 2)
-    : [];
+  const hasQuestionParts = question.questionPart1 && question.questionPart2;
 
-  const handleSelectedAnswer = (
-    answer: string,
-    part: 'single' | 'part1' | 'part2',
-  ) => {
-    if (!hasQuestionParts) {
-      setSelectedAnswersSingle((prev) =>
-        prev.includes(answer)
-          ? prev.filter((a) => a !== answer)
-          : [...prev, answer],
-      );
-    } else if (part === 'part1') {
-      setSelectedAnswersPart1((prev) =>
-        prev.includes(answer)
-          ? prev.filter((a) => a !== answer)
-          : [...prev, answer],
-      );
-    } else {
-      setSelectedAnswersPart2((prev) =>
-        prev.includes(answer)
-          ? prev.filter((a) => a !== answer)
-          : [...prev, answer],
-      );
-    }
+  const handleSelectedAnswer = (answer: Answer, part?: 'part1' | 'part2') => {
+    dispatch(
+      selectAnswer({
+        questionId: question.uuid,
+        answer,
+        part,
+      }),
+    );
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Spacer size={68} />
-      <View style={styles.questionHeader}>
-        <Text
-          style={styles.questionCounterText}
-        >{`Question 01/${MAX_QUESTIONS}`}</Text>
-        <CountdownCircle duration={20} />
-      </View>
-      <Spacer size={49} />
-      {hasQuestionParts ? (
-        <>
-          <Text style={styles.question}>{mockQuestion.question}</Text>
-          <Spacer size={33} />
-          <Text style={styles.question}>{mockQuestion.questionPart1}</Text>
+    <>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={{ paddingBottom: 150 }}
+      >
+        <SafeAreaView>
+          <Spacer size={68} />
+          <View style={styles.questionHeader}>
+            <Text style={styles.questionCounterText}>{`Question ${
+              currentQuestionIndex + 1
+            }/${MAX_QUESTIONS}`}</Text>
+            <CountdownCircle duration={20} />
+          </View>
+          <Spacer size={49} />
+          {hasQuestionParts ? (
+            <>
+              {question.question && (
+                <>
+                  <Text style={styles.question}>{question.question}</Text>
+                  <Spacer size={33} />
+                </>
+              )}
+              <Text style={styles.question}>{question.questionPart1}</Text>
+              <Spacer size={20} />
+              <AnswerOptions
+                answers={question.answers.slice(0, question.answers.length / 2)}
+                selectedAnswer={selectedAnswers[`${question.uuid}_part1`] || []}
+                onSelect={(answer) => handleSelectedAnswer(answer, 'part1')}
+              />
+              <Spacer size={20} />
+              <Text style={styles.question}>{question.questionPart2}</Text>
+              <Spacer size={20} />
+              <AnswerOptions
+                answers={question.answers.slice(question.answers.length / 2)}
+                selectedAnswer={selectedAnswers[`${question.uuid}_part2`] || []}
+                onSelect={(answer) => handleSelectedAnswer(answer, 'part2')}
+              />
+            </>
+          ) : (
+            <>
+              <Text style={styles.question}>{question.question}</Text>
+              <Spacer size={20} />
+              <AnswerOptions
+                answers={question.answers}
+                selectedAnswer={
+                  selectedAnswers[`${question.uuid}_single`] || []
+                }
+                onSelect={(answer) => handleSelectedAnswer(answer)}
+              />
+            </>
+          )}
           <Spacer size={20} />
-          <AnswerOptions
-            answers={answersPart1}
-            selectedAnswer={selectedAnswersPart1}
-            onSelect={handleSelectedAnswer}
-            part="part1"
-          />
-          <Spacer size={20} />
-          <Text style={styles.question}>{mockQuestion.questionPart2}</Text>
-          <Spacer size={20} />
-          <AnswerOptions
-            answers={answersPart2}
-            selectedAnswer={selectedAnswersPart2}
-            onSelect={handleSelectedAnswer}
-            part="part2"
-          />
-        </>
-      ) : (
-        <>
-          <Text style={styles.question}>{mockQuestion.question}</Text>
-          <Spacer size={20} />
-          <AnswerOptions
-            answers={mockQuestion.answers}
-            selectedAnswer={selectedAnswersSingle}
-            onSelect={handleSelectedAnswer}
-            part="single"
-          />
-        </>
-      )}
-      <Spacer size={20} />
+        </SafeAreaView>
+      </ScrollView>
       <View style={styles.buttonContainer}>
-        <CustomButton title="Valider" onPress={() => {}} />
+        <CustomButton
+          title="Valider"
+          onPress={() => dispatch(nextQuestion())}
+        />
       </View>
-    </SafeAreaView>
+    </>
   );
 };
 

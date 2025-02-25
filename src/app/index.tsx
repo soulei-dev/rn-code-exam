@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Text, ScrollView, View, FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Spacer from '@components/generals/Spacer';
@@ -7,6 +7,7 @@ import ResultCard from '@components/cards/ResultCard';
 import AddButton from '@components/buttons/FloatingAddButton';
 import { COLORS } from '@constants/colors';
 import { useRouter } from 'expo-router';
+import { selectRandomQuestions } from '@utils/selectedRandomQuestions';
 
 const HomeScreen = () => {
   const router = useRouter();
@@ -27,6 +28,12 @@ const HomeScreen = () => {
     { id: '7', date: new Date(2024, 9, 20, 17, 55), score: 30 },
     { id: '8', date: new Date(2024, 9, 20, 17, 55), score: 30 },
   ];
+
+  useEffect(() => {
+    const randomQuestions = selectRandomQuestions();
+
+    console.log(randomQuestions[0].question);
+  }, []);
 
   return (
     <>

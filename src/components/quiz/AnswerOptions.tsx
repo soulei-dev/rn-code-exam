@@ -1,38 +1,32 @@
 import Spacer from '@components/generals/Spacer';
 import { COLORS } from '@constants/colors';
+import { Answer } from 'src/models/question';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View, Text } from 'react-native';
 
-type Answer = {
-  correct?: boolean;
-  label: string;
-};
-
 type AnswerOptionsProps = {
   answers: Answer[];
-  selectedAnswer: string[];
-  onSelect: (answer: string, part: 'single' | 'part1' | 'part2') => void;
-  part: 'single' | 'part1' | 'part2';
+  selectedAnswer: Answer[];
+  onSelect: (answer: Answer) => void;
 };
 
 const AnswerOptions = ({
   answers,
   selectedAnswer,
   onSelect,
-  part = 'single',
 }: AnswerOptionsProps) => {
   const prefix = ['A', 'B', 'C', 'D', 'E', 'F'];
 
   return (
     <View style={styles.container}>
       {answers.map((answer, index) => {
-        const isSelected = selectedAnswer.includes(answer.label);
+        const isSelected = selectedAnswer.some((a) => a.label === answer.label);
 
         return (
           <View key={index}>
             <TouchableOpacity
               key={answer.label}
-              onPress={() => onSelect(answer.label, part)}
+              onPress={() => onSelect(answer)}
               style={[
                 styles.answerContainer,
                 isSelected && styles.selectedAnswer,
@@ -75,18 +69,21 @@ export default AnswerOptions;
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    gap: 42,
+    columnGap: 42,
+    rowGap: 10,
+    flexWrap: 'wrap',
+    alignItems: 'center',
   },
   answerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: 103,
-    height: 43,
     borderRadius: 14,
     backgroundColor: COLORS.white,
     borderWidth: 1,
     borderColor: '#D9D9D9',
     paddingHorizontal: 7,
+    paddingVertical: 6,
+    maxWidth: '100%',
   },
   answerLabel: {
     fontSize: 14,
@@ -95,6 +92,7 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     letterSpacing: 0.56,
     textTransform: 'uppercase',
+    flexShrink: 1,
   },
   prefixContainer: {
     width: 33,
