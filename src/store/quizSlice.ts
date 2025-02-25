@@ -103,11 +103,8 @@ const quizSlice = createSlice({
             }
           }
         });
-
-        console.log('DEBUG groupedAnswers: ', JSON.stringify(groupedAnswers, null, 2))
     
         state.correctAnswersCount = correctAnswersCount;
-        console.log('DEBUG correctAnswersCount: ', correctAnswersCount);
         state.isTestPassed = correctAnswersCount >= 35;
       }
     },
