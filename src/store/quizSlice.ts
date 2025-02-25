@@ -48,11 +48,13 @@ const quizSlice = createSlice({
         break;
       }
     },
-    nextQuestion(state) {
+    nextQuestion: (state) => {
       if (state.currentQuestionIndex < state.questions.length - 1) {
         state.currentQuestionIndex++;
-      } else {
-        let correctAnswersCount = 0;
+      }
+    },
+    finalizeQuiz: (state) => {
+      let correctAnswersCount = 0;
         const groupedAnswers: Record<string, Answer[]> = {};
     
         Object.entries(state.selectedAnswers).forEach(([questionKey, userAnswers]) => {
@@ -106,9 +108,8 @@ const quizSlice = createSlice({
     
         state.correctAnswersCount = correctAnswersCount;
         state.isTestPassed = correctAnswersCount >= 35;
-      }
     },
-    resetQuiz(state) {
+    resetQuiz: (state) => {
       state.currentQuestionIndex = 0;
       state.selectedAnswers = {};
       state.questions = selectRandomQuestions();
@@ -118,5 +119,5 @@ const quizSlice = createSlice({
   },
 });
 
-export const { selectAnswer, nextQuestion, resetQuiz } = quizSlice.actions;
+export const { selectAnswer, nextQuestion, resetQuiz, finalizeQuiz } = quizSlice.actions;
 export default quizSlice.reducer;

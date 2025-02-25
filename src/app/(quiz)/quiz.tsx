@@ -8,11 +8,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AnswerOptions from '@components/quiz/AnswerOptions';
 import CustomButton from '@components/buttons/CustomButton';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@store/store';
-import { selectAnswer, nextQuestion } from '@store/quizSlice';
+import { RootState, store } from '@store/store';
+import { selectAnswer, nextQuestion, finalizeQuiz } from '@store/quizSlice';
 import { Answer } from '@models/question';
+import { useRouter } from 'expo-router';
 
 const QuizScreen = () => {
+  const router = useRouter();
   const dispatch = useDispatch();
   const { questions, currentQuestionIndex, selectedAnswers } = useSelector(
     (state: RootState) => state.quiz,
@@ -33,6 +35,23 @@ const QuizScreen = () => {
         type: question.type,
       }),
     );
+  };
+
+  const handleValidateQuestion = () => {
+    if (currentQuestionIndex + 1 === MAX_QUESTIONS) {
+      dispatch(finalizeQuiz());
+
+      const finalScore = store.getState().quiz.correctAnswersCount;
+
+      router.push({
+        pathname: '/results',
+        params: {
+          correctAnswersCount: finalScore.toString(),
+        },
+      });
+    }
+
+    dispatch(nextQuestion());
   };
 
   return (
@@ -94,10 +113,7 @@ const QuizScreen = () => {
         </SafeAreaView>
       </ScrollView>
       <View style={styles.buttonContainer}>
-        <CustomButton
-          title="Valider"
-          onPress={() => dispatch(nextQuestion())}
-        />
+        <CustomButton title="Valider" onPress={handleValidateQuestion} />
       </View>
     </>
   );
