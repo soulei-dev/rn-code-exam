@@ -14,7 +14,7 @@ const Spacer = ({ horizontal = false, size }: SpacerProps) => {
     height: !horizontal ? size : defaultValue,
   };
 
-  return <View style={style as StyleProp<ViewStyle>} />;
+  return <View testID="spacer" style={style as StyleProp<ViewStyle>} />;
 };
 
 export default Spacer;
