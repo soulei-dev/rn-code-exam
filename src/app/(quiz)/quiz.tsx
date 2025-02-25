@@ -20,7 +20,9 @@ const QuizScreen = () => {
     (state: RootState) => state.quiz,
   );
 
-  const [remainingTime, setRemainingTime] = useState<number>(TIMER_DURATION);
+  const [remainingTime, setRemainingTime] = useState<number | null>(
+    TIMER_DURATION,
+  );
 
   const question = questions[currentQuestionIndex];
 
@@ -48,6 +50,8 @@ const QuizScreen = () => {
       dispatch(finalizeQuiz());
 
       const finalScore = store.getState().quiz.correctAnswersCount;
+
+      setRemainingTime(null);
 
       router.push({
         pathname: '/results',
