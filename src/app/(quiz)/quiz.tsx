@@ -47,7 +47,10 @@ const QuizScreen = () => {
             <Text style={styles.questionCounterText}>{`Question ${
               currentQuestionIndex + 1
             }/${MAX_QUESTIONS}`}</Text>
-            <CountdownCircle duration={20} />
+            <CountdownCircle
+              duration={20}
+              onTimeout={() => dispatch(nextQuestion())}
+            />
           </View>
           <Spacer size={49} />
           {hasQuestionParts ? (

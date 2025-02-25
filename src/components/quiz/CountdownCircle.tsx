@@ -5,9 +5,10 @@ import Svg, { Circle } from 'react-native-svg';
 
 type CountdownCircleProps = {
   duration: number;
+  onTimeout: () => void;
 };
 
-const CountdownCircle = ({ duration }: CountdownCircleProps) => {
+const CountdownCircle = ({ duration, onTimeout }: CountdownCircleProps) => {
   const radius = 18;
   const strokeWidth = 5;
   const circumference = 2 * Math.PI * radius;
@@ -28,6 +29,8 @@ const CountdownCircle = ({ duration }: CountdownCircleProps) => {
 
       if (newProgress > 0) {
         requestAnimationFrame(animate);
+      } else {
+        onTimeout();
       }
     };
 
@@ -36,7 +39,7 @@ const CountdownCircle = ({ duration }: CountdownCircleProps) => {
     return () => {
       startTime = null;
     };
-  }, [duration]);
+  }, [duration, onTimeout]);
 
   return (
     <View style={styles.container}>
