@@ -22,12 +22,15 @@ const QuizScreen = () => {
 
   const hasQuestionParts = question.questionPart1 && question.questionPart2;
 
-  const handleSelectedAnswer = (answer: Answer, part?: 'part1' | 'part2') => {
+  const handleSelectedAnswer = (
+    answer: Answer,
+    part: 'part1' | 'part2' | 'single',
+  ) => {
     dispatch(
       selectAnswer({
-        questionId: question.uuid,
+        questionId: `${question.uuid}_${part}`,
         answer,
-        part,
+        type: question.type,
       }),
     );
   };
@@ -80,7 +83,7 @@ const QuizScreen = () => {
                 selectedAnswer={
                   selectedAnswers[`${question.uuid}_single`] || []
                 }
-                onSelect={(answer) => handleSelectedAnswer(answer)}
+                onSelect={(answer) => handleSelectedAnswer(answer, 'single')}
               />
             </>
           )}

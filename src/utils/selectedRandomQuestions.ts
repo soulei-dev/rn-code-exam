@@ -3,7 +3,7 @@ import questionsData from "@data/filtered_data.json";
 import { Question } from '@models/question';
 
 
-const categoryQuotas: Record<string, { min: number; max: number }> = {
+export const categoryQuotas: Record<string, { min: number; max: number }> = {
   driver: { min: 6, max: 10 },
   safety: { min: 3, max: 4 },
   traffic: { min: 3, max: 4 },
