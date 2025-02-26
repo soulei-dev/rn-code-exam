@@ -1,7 +1,7 @@
 import Spacer from '@components/generals/Spacer';
 import { COLORS } from '@constants/colors';
-import { MAX_QUESTIONS, TIMER_DURATION } from '@constants/quizConstants';
-import React, { useEffect, useState } from 'react';
+import { MAX_QUESTIONS } from '@constants/quizConstants';
+import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AnswerOptions from '@components/quiz/AnswerOptions';
