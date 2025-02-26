@@ -7,7 +7,7 @@ import ResultCard from '@components/cards/ResultCard';
 import AddButton from '@components/buttons/FloatingAddButton';
 import { COLORS } from '@constants/colors';
 import { useRouter } from 'expo-router';
-import { getQuizResult, storage } from 'src/storages/quizStorage';
+import { getQuizResult } from 'src/storages/quizStorage';
 import { QuizResult } from '@models/question';
 
 const HomeScreen = () => {
@@ -40,7 +40,6 @@ const HomeScreen = () => {
 
   useEffect(() => {
     fetchResults();
-    // storage.clearAll();
   }, []);
 
   return (

@@ -1,4 +1,3 @@
-import CountdownCircle from '@components/quiz/CountdownCircle';
 import Spacer from '@components/generals/Spacer';
 import { COLORS } from '@constants/colors';
 import { MAX_QUESTIONS, TIMER_DURATION } from '@constants/quizConstants';
@@ -21,14 +20,8 @@ const QuizScreen = () => {
     (state: RootState) => state.quiz,
   );
 
-  const [remainingTime, setRemainingTime] = useState<number>(TIMER_DURATION);
-
   const question = questions[currentQuestionIndex];
   const hasQuestionParts = question.questionPart1 && question.questionPart2;
-
-  const resetTimer = () => {
-    setRemainingTime(TIMER_DURATION);
-  };
 
   const handleSelectedAnswer = (
     answer: Answer,
@@ -60,7 +53,6 @@ const QuizScreen = () => {
     }
 
     dispatch(nextQuestion());
-    resetTimer();
   };
 
   return (
@@ -71,15 +63,9 @@ const QuizScreen = () => {
       >
         <SafeAreaView>
           <Spacer size={68} />
-          <View style={styles.questionHeader}>
-            <Text style={styles.questionCounterText}>{`Question ${
-              currentQuestionIndex + 1
-            }/${MAX_QUESTIONS}`}</Text>
-            <CountdownCircle
-              duration={TIMER_DURATION}
-              onTimeout={handleValidateQuestion}
-            />
-          </View>
+          <Text style={styles.questionCounterText}>{`Question ${
+            currentQuestionIndex + 1
+          }/${MAX_QUESTIONS}`}</Text>
           <Spacer size={49} />
           {hasQuestionParts ? (
             <>
@@ -134,11 +120,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 17,
-  },
-  questionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
   },
   questionCounterText: {
     fontSize: 16,
