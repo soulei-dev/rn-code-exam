@@ -1,32 +1,27 @@
 import { COLORS } from '@constants/colors';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
+import { useFocusEffect } from '@react-navigation/native';
 
 type CountdownCircleProps = {
   duration: number;
-  remainingTime: number | null;
-  onRemainingTime: React.Dispatch<React.SetStateAction<number | null>>;
+  onTimeout: () => void;
 };
 
-const CountdownCircle = ({
-  duration,
-  remainingTime,
-  onRemainingTime,
-}: CountdownCircleProps) => {
+const CountdownCircle = ({ duration, onTimeout }: CountdownCircleProps) => {
   const radius = 18;
   const strokeWidth = 5;
   const circumference = 2 * Math.PI * radius;
 
+  const [remainingTime, setRemainingTime] = useState(duration);
   const [progress, setProgress] = useState(1);
   const animationFrameRef = useRef<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    if (remainingTime === null) return;
-
-    onRemainingTime(duration);
+  const startTimer = useCallback(() => {
+    setRemainingTime(duration);
     setProgress(1);
     startTimeRef.current = Date.now();
 
@@ -42,17 +37,28 @@ const CountdownCircle = ({
     };
 
     intervalRef.current = setInterval(() => {
-      onRemainingTime((prev) => (prev && prev > 0 ? prev - 1 : 0));
+      setRemainingTime((prev) => {
+        if (prev > 1) return prev - 1;
+        clearInterval(intervalRef.current as NodeJS.Timeout);
+        onTimeout();
+        return 0;
+      });
     }, 1000);
 
     animationFrameRef.current = requestAnimationFrame(animate);
+  }, [duration, onTimeout]);
 
-    return () => {
-      if (animationFrameRef.current)
-        cancelAnimationFrame(animationFrameRef.current);
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [duration, remainingTime]);
+  useFocusEffect(
+    useCallback(() => {
+      startTimer();
+
+      return () => {
+        if (animationFrameRef.current)
+          cancelAnimationFrame(animationFrameRef.current);
+        if (intervalRef.current) clearInterval(intervalRef.current);
+      };
+    }, [startTimer]),
+  );
 
   return (
     <View style={styles.container}>
@@ -83,7 +89,7 @@ const CountdownCircle = ({
   );
 };
 
-export default CountdownCircle;
+export default React.memo(CountdownCircle);
 
 const styles = StyleSheet.create({
   container: {

@@ -2,15 +2,28 @@ import CustomButton from '@components/buttons/CustomButton';
 import Spacer from '@components/generals/Spacer';
 import QuizScore from '@components/quiz/QuizScore';
 import { COLORS } from '@constants/colors';
+import { resetQuiz } from '@store/quizSlice';
 import { RootState } from '@store/store';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const ResultsScreen = () => {
+  const router = useRouter();
+  const dispatch = useDispatch();
   const { isTestPassed } = useSelector((state: RootState) => state.quiz);
   const { correctAnswersCount } = useLocalSearchParams();
+
+  const handleRestartQuiz = () => {
+    dispatch(resetQuiz());
+    router.push('/quiz');
+  };
+
+  const handleReturnToHomeScreen = () => {
+    dispatch(resetQuiz());
+    router.push('/');
+  };
 
   return (
     <View style={styles.container}>
@@ -21,11 +34,11 @@ const ResultsScreen = () => {
         {isTestPassed ? 'Bravo !' : 'Dommage !'}
       </Text>
       <View style={styles.footer}>
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onPress={handleReturnToHomeScreen}>
           <Text style={styles.backMessage}>Retour aux résultats</Text>
         </TouchableOpacity>
         <Spacer size={20} />
-        <CustomButton title="Nouvelle série" onPress={() => {}} />
+        <CustomButton title="Nouvelle série" onPress={handleRestartQuiz} />
       </View>
     </View>
   );

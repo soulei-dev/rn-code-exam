@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, ScrollView, View, FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Spacer from '@components/generals/Spacer';
@@ -7,26 +7,41 @@ import ResultCard from '@components/cards/ResultCard';
 import AddButton from '@components/buttons/FloatingAddButton';
 import { COLORS } from '@constants/colors';
 import { useRouter } from 'expo-router';
+import { getQuizResult, storage } from 'src/storages/quizStorage';
+import { QuizResult } from '@models/question';
 
 const HomeScreen = () => {
   const router = useRouter();
 
-  const mockScores = [
-    { score: 37, label: 'Meilleure score' },
-    { score: 28, label: 'Dernier score' },
-    { score: 26, label: 'Score moyen' },
+  const [quizResults, setQuizResults] = useState<QuizResult[]>([]);
+
+  const scores = quizResults.map((result) => result.score);
+  const lastScore = scores.length ? scores[0] : 0;
+  const bestScore = scores.length ? Math.max(...scores) : 0;
+  const averageScore = scores.length
+    ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+    : 0;
+
+  const dynamicScores = [
+    { score: bestScore, label: 'Meilleur score' },
+    { score: lastScore, label: 'Dernier score' },
+    { score: averageScore, label: 'Score moyen' },
   ];
 
-  const mockResults = [
-    { id: '1', date: new Date(2025, 1, 10, 14, 30), score: 37 },
-    { id: '2', date: new Date(2025, 0, 25, 9, 45), score: 32 },
-    { id: '3', date: new Date(2024, 11, 18, 16, 10), score: 29 },
-    { id: '4', date: new Date(2024, 10, 5, 11, 20), score: 24 },
-    { id: '5', date: new Date(2024, 9, 20, 17, 55), score: 30 },
-    { id: '6', date: new Date(2024, 9, 20, 17, 55), score: 30 },
-    { id: '7', date: new Date(2024, 9, 20, 17, 55), score: 30 },
-    { id: '8', date: new Date(2024, 9, 20, 17, 55), score: 30 },
-  ];
+  const fetchResults = () => {
+    const results = getQuizResult();
+    const sortedResults = results.sort(
+      (a: QuizResult, b: QuizResult) =>
+        new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
+
+    setQuizResults(sortedResults);
+  };
+
+  useEffect(() => {
+    fetchResults();
+    // storage.clearAll();
+  }, []);
 
   return (
     <>
@@ -37,7 +52,7 @@ const HomeScreen = () => {
           <Spacer size={27} />
           <View style={styles.content}>
             <View style={styles.scoreContainer}>
-              {mockScores.map((item, index) => (
+              {dynamicScores.map((item, index) => (
                 <ScoreDisplay
                   key={index}
                   score={item.score}
@@ -49,14 +64,19 @@ const HomeScreen = () => {
             <Text style={styles.resultsTitle}>RÉSULTATS</Text>
             <Spacer size={11} />
             <FlatList
-              data={mockResults}
+              data={quizResults}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <ResultCard date={item.date} score={item.score} />
+                <ResultCard date={new Date(item.date)} score={item.score} />
               )}
               ItemSeparatorComponent={() => <Spacer size={16} />}
               scrollEnabled={false}
               contentContainerStyle={styles.listContentContainer}
+              ListEmptyComponent={() => (
+                <Text style={styles.listEmptyMessage}>
+                  Vous n'avez pas encore passé de test
+                </Text>
+              )}
             />
           </View>
         </SafeAreaView>
@@ -99,5 +119,11 @@ const styles = StyleSheet.create({
   },
   listContentContainer: {
     paddingBottom: 150,
+  },
+  listEmptyMessage: {
+    textAlign: 'center',
+    fontSize: 16,
+    fontFamily: 'BricolageGrotesque-SemiBold',
+    color: COLORS.text,
   },
 });

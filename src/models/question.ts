@@ -18,3 +18,9 @@ export type Answer = {
   label: string;
   correct?: boolean;
 };
+
+export type QuizResult = {
+  id: string;
+  score: number;
+  date: Date;
+};

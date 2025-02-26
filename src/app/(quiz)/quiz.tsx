@@ -12,6 +12,7 @@ import { RootState, store } from '@store/store';
 import { selectAnswer, nextQuestion, finalizeQuiz } from '@store/quizSlice';
 import { Answer } from '@models/question';
 import { useRouter } from 'expo-router';
+import { storeQuizResult } from 'src/storages/quizStorage';
 
 const QuizScreen = () => {
   const router = useRouter();
@@ -20,12 +21,9 @@ const QuizScreen = () => {
     (state: RootState) => state.quiz,
   );
 
-  const [remainingTime, setRemainingTime] = useState<number | null>(
-    TIMER_DURATION,
-  );
+  const [remainingTime, setRemainingTime] = useState<number>(TIMER_DURATION);
 
   const question = questions[currentQuestionIndex];
-
   const hasQuestionParts = question.questionPart1 && question.questionPart2;
 
   const resetTimer = () => {
@@ -51,7 +49,7 @@ const QuizScreen = () => {
 
       const finalScore = store.getState().quiz.correctAnswersCount;
 
-      setRemainingTime(null);
+      storeQuizResult(finalScore);
 
       router.push({
         pathname: '/results',
@@ -64,12 +62,6 @@ const QuizScreen = () => {
     dispatch(nextQuestion());
     resetTimer();
   };
-
-  useEffect(() => {
-    if (remainingTime === 0) {
-      handleValidateQuestion();
-    }
-  }, [remainingTime]);
 
   return (
     <>
@@ -84,10 +76,8 @@ const QuizScreen = () => {
               currentQuestionIndex + 1
             }/${MAX_QUESTIONS}`}</Text>
             <CountdownCircle
-              key={currentQuestionIndex}
               duration={TIMER_DURATION}
-              remainingTime={remainingTime}
-              onRemainingTime={setRemainingTime}
+              onTimeout={handleValidateQuestion}
             />
           </View>
           <Spacer size={49} />
